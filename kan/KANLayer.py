@@ -361,4 +361,3 @@ class KANLayer(nn.Module):
             swap_(self.scale_base.data, i1, i2, mode=mode)
             swap_(self.scale_sp.data, i1, i2, mode=mode)
             swap_(self.mask.data, i1, i2, mode=mode)
-

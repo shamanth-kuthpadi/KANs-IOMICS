@@ -1,3 +1,4 @@
+
 import torch
 import torch.nn as nn
 import numpy as np
@@ -20,6 +21,7 @@ import yaml
 from .spline import curve2coef
 from .utils import SYMBOLIC_LIB
 from .hypothesis import plot_tree
+import csv
 
 class MultKAN(nn.Module):
     '''
@@ -93,7 +95,7 @@ class MultKAN(nn.Module):
             the number of times rewind() has been called
         device : str
     '''
-    def __init__(self, width=None, grid=3, k=3, mult_arity = 2, noise_scale=0.3, scale_base_mu=0.0, scale_base_sigma=1.0, base_fun='silu', symbolic_enabled=True, affine_trainable=False, grid_eps=0.02, grid_range=[-1, 1], sp_trainable=True, sb_trainable=True, seed=1, save_act=True, sparse_init=False, auto_save=True, first_init=True, ckpt_path='./model', state_id=0, round=0, device='cpu'):
+    def __init__(self, width=None, scale_sp=1., grid=3, k=3, mult_arity = 2, noise_scale=0.3, scale_base_mu=0.0, scale_base_sigma=1.0, base_fun='silu', symbolic_enabled=True, affine_trainable=False, grid_eps=0.02, grid_range=[-1, 1], sp_trainable=True, sb_trainable=True, seed=1, save_act=True, sparse_init=False, auto_save=True, first_init=True, ckpt_path='./model', state_id=0, round=0, device='cpu'):
         '''
         initalize a KAN model
         
@@ -211,7 +213,7 @@ class MultKAN(nn.Module):
                 k_l = k
                     
             
-            sp_batch = KANLayer(in_dim=width_in[l], out_dim=width_out[l+1], num=grid_l, k=k_l, noise_scale=noise_scale, scale_base_mu=scale_base_mu, scale_base_sigma=scale_base_sigma, scale_sp=1., base_fun=base_fun, grid_eps=grid_eps, grid_range=grid_range, sp_trainable=sp_trainable, sb_trainable=sb_trainable, sparse_init=sparse_init)
+            sp_batch = KANLayer(in_dim=width_in[l], out_dim=width_out[l+1], num=grid_l, k=k_l, noise_scale=noise_scale, scale_base_mu=scale_base_mu, scale_base_sigma=scale_base_sigma, scale_sp=scale_sp, base_fun=base_fun, grid_eps=grid_eps, grid_range=grid_range, sp_trainable=sp_trainable, sb_trainable=sb_trainable, sparse_init=sparse_init)
             self.act_fun.append(sp_batch)
 
         self.node_bias = []
@@ -534,9 +536,6 @@ class MultKAN(nn.Module):
             round = model.round,
             device = str(model.device)
         )
-        
-        if dic["device"].isdigit():
-            dic["device"] = int(model.device)
 
         for i in range (model.depth):
             dic[f'symbolic.funs_name.{i}'] = model.symbolic_fun[i].funs_name
@@ -1409,7 +1408,7 @@ class MultKAN(nn.Module):
         
             
     def fit(self, dataset, opt="LBFGS", steps=100, log=1, lamb=0., lamb_l1=1., lamb_entropy=2., lamb_coef=0., lamb_coefdiff=0., update_grid=True, grid_update_num=10, loss_fn=None, lr=1.,start_grid_update_step=-1, stop_grid_update_step=50, batch=-1,
-              metrics=None, save_fig=False, in_vars=None, out_vars=None, beta=3, save_fig_freq=1, img_folder='./video', singularity_avoiding=False, y_th=1000., reg_metric='edge_forward_spline_n', display_metrics=None):
+              metrics=None, save_fig=False, in_vars=None, out_vars=None, beta=3, save_fig_freq=1, img_folder='./video', singularity_avoiding=False, y_th=1000., reg_metric='edge_forward_spline_n', display_metrics=None, logger=False, log_output=None):
         '''
         training
 
@@ -1479,6 +1478,17 @@ class MultKAN(nn.Module):
         # Most examples in toturals involve the fit() method. Please check them for useness.
         '''
 
+        if logger == 'csv':
+            csv_file = open(f'/Users/shamanthk/Documents/Spring 2025/iomics/focused/logs/{log_output}', 'w', newline='')
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerow([
+                'step',
+                'train_loss','test_loss','reg',
+                'subnode_act_mean','edge_act_mean',
+                'act_scale_mean','act_scale_spline_mean',
+                'coef_mean'
+            ])
+
         if lamb > 0. and not self.save_act:
             print('setting lamb=0. If you want to set lamb > 0, set self.save_act=True')
             
@@ -1537,7 +1547,7 @@ class MultKAN(nn.Module):
                 os.makedirs(img_folder)
 
         for _ in pbar:
-            
+
             if _ == steps-1 and old_save_act:
                 self.save_act = True
                 
@@ -1581,6 +1591,31 @@ class MultKAN(nn.Module):
             results['test_loss'].append(torch.sqrt(test_loss).cpu().detach().numpy())
             results['reg'].append(reg_.cpu().detach().numpy())
 
+            subnode_act_mean = sum(t.mean().item() for t in self.subnode_actscale) / len(self.subnode_actscale)
+            # print(len(self.subnode_actscale))
+            edge_act_mean = sum(t.mean().item() for t in self.edge_actscale) / len(self.edge_actscale)
+            # print(len(self.edge_actscale))
+            act_scale_mean = sum(t.mean().item() for t in self.acts_scale) / len(self.acts_scale)
+            # print(len(self.acts_scale))
+            act_scale_spline_mean = sum(t.mean().item() for t in self.acts_scale_spline) / len(self.acts_scale_spline)
+            # print(len(self.acts_scale_spline))
+
+            coef_means = [torch.mean(torch.abs(layer.coef)).item() for layer in self.act_fun if hasattr(layer, "coef")]
+            coef_mean = sum(coef_means) / len(coef_means) if coef_means else 0.0
+
+            if logger == 'csv':
+                csv_writer.writerow([
+                    _,
+                    train_loss.item(),
+                    test_loss.item(),
+                    reg_.item(),
+                    subnode_act_mean,
+                    edge_act_mean,
+                    act_scale_mean,
+                    act_scale_spline_mean,
+                    coef_mean
+                ])
+            
             if _ % log == 0:
                 if display_metrics == None:
                     pbar.set_description("| train_loss: %.2e | test_loss: %.2e | reg: %.2e | " % (torch.sqrt(train_loss).cpu().detach().numpy(), torch.sqrt(test_loss).cpu().detach().numpy(), reg_.cpu().detach().numpy()))
