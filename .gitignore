@@ -1,4 +1,5 @@
-__pycache__
+
+
 
 model
 
@@ -6,3 +7,18 @@ video
 
 
 logs
+__pycache__/
+.DS_Store
+docs/_build/
+docs/_static/
+docs/_templates
+test
+sr
+pde
+hidden
+molecule
+expressiveness
+figures
+molecule
+applications
+experiments
