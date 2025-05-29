@@ -3,7 +3,7 @@ import os
 from kan import *
 from utilities.utils import *
 
-base_log_dir = '/Users/shamanthk/Documents/KANs-IOMICS/logs/sweep/unsupervised_experiment'
+base_log_dir = '/Users/shamanthk/Documents/KANs-IOMICS/logs/shock/unsupervised_experiment'
 
 torch.set_default_dtype(torch.float64)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -90,7 +90,7 @@ for param_name, values in sweep_config.items():
 
         config = default_config.copy()
         config[param_name] = val
-        
+
         print(f"\n=== Sweep {param_name} = {val} ===")
 
         model = KAN(
@@ -141,5 +141,6 @@ for param_name, values in sweep_config.items():
             save_fig=True,
             save_fig_freq=1,
             logger='csv',
-            log_output=log_name
+            log_output=log_name,
+            shock_coef=True
         )

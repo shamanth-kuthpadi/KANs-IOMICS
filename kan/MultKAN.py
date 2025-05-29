@@ -1407,7 +1407,7 @@ class MultKAN(nn.Module):
         
             
     def fit(self, dataset, opt="LBFGS", steps=100, log=1, lamb=0., lamb_l1=1., lamb_entropy=2., lamb_coef=0., lamb_coefdiff=0., update_grid=True, grid_update_num=10, loss_fn=None, lr=1.,start_grid_update_step=-1, stop_grid_update_step=50, batch=-1,
-              metrics=None, save_fig=False, in_vars=None, out_vars=None, beta=3, save_fig_freq=1, img_folder='./video', singularity_avoiding=False, y_th=1000., reg_metric='edge_forward_spline_n', display_metrics=None, logger=False, log_output=None):
+              metrics=None, save_fig=False, in_vars=None, out_vars=None, beta=3, save_fig_freq=1, img_folder='./video', singularity_avoiding=False, y_th=1000., reg_metric='edge_forward_spline_n', display_metrics=None, logger=False, log_output=None, shock_coef=False):
         '''
         training
 
@@ -1546,7 +1546,14 @@ class MultKAN(nn.Module):
                 os.makedirs(img_folder)
 
         for _ in pbar:
-
+            
+            if shock_coef and _ == steps // 2:
+                print("⚡️ Shocking ALL coefficients!")
+                for layer in self.act_fun:
+                    if hasattr(layer, "coef"):
+                        with torch.no_grad():
+                            noise = torch.randn_like(layer.coef) * 1.5
+                            layer.coef += noise
             if _ == steps-1 and old_save_act:
                 self.save_act = True
                 
