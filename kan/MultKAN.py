@@ -1478,7 +1478,7 @@ class MultKAN(nn.Module):
         '''
 
         if logger == 'csv':
-            csv_file = open(f'/Users/shamanthk/Documents/KANs-IOMICS/logs/{log_output}', 'w', newline='')
+            csv_file = open(log_output, 'w', newline='')
             csv_writer = csv.writer(csv_file)
             csv_writer.writerow([
                 'step',

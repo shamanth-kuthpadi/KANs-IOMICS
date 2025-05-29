@@ -94,7 +94,9 @@ def plot_multiple_results(files,
                           labels=None, 
                           cols=3, 
                           figsize_per_row=(15, 3),
-                          colors=None):
+                          colors=None,
+                          save_dir=None,
+                          save_name="plot.png"):
 
     if isinstance(files, str):
         files = glob.glob(files)
@@ -103,11 +105,8 @@ def plot_multiple_results(files,
         labels = [os.path.splitext(os.path.basename(f))[0] for f in files]
     if colors is None:
         colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-    dfs = []
-    for f in files:
-        df = pd.read_csv(f).set_index('step')
-        # df = df.drop(columns=['coef_mean'])
-        dfs.append(df)
+    dfs = [pd.read_csv(f).set_index('step') for f in files]
+
     metrics = dfs[0].columns.tolist()
     n_metrics = len(metrics)
     rows = int(np.ceil(n_metrics / cols))
@@ -131,6 +130,14 @@ def plot_multiple_results(files,
         ax.axis('off')
 
     plt.tight_layout()
+
+    # Save if a directory is provided
+    if save_dir:
+        os.makedirs(save_dir, exist_ok=True)
+        save_path = os.path.join(save_dir, save_name)
+        plt.savefig(save_path, dpi=300)
+        print(f"Plot saved to: {save_path}")
+
     plt.show()
 
 

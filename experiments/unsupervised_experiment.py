@@ -82,15 +82,15 @@ for param_name, values in sweep_config.items():
     for val in values:
         log_dir = os.path.join(base_log_dir, param_name)
         os.makedirs(log_dir, exist_ok=True)
-        log_name = f"sweep/unsupervised_experiment/{param_name}/{param_name}_{val}.csv"
-
+        log_name = os.path.join(log_dir, f"{param_name}_{val}.csv")
+        
         if os.path.exists(log_name):
             print(f"Skipping {param_name} = {val} (already exists)")
             continue
 
         config = default_config.copy()
         config[param_name] = val
-
+        
         print(f"\n=== Sweep {param_name} = {val} ===")
 
         model = KAN(
