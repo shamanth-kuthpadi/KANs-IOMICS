@@ -3,7 +3,7 @@ import os
 from kan import *
 from utilities.utils import *
 
-base_log_dir = '/Users/shamanthk/Documents/Spring 2025/iomics/focused/logs/sweep/supervised_reg_experiment'
+base_log_dir = '/Users/shamanthk/Documents/KANs-IOMICS/logs/sweep/supervised_reg_experiment'
 
 torch.set_default_dtype(torch.float64)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -83,6 +83,13 @@ dtype = torch.get_default_dtype()
 
 for param_name, values in sweep_config.items():
     for val in values:
+        log_dir = os.path.join(base_log_dir, param_name)
+        os.makedirs(log_dir, exist_ok=True)
+        log_name = f"sweep/supervised_reg_experiment/{param_name}/{param_name}_{val}.csv"
+
+        if os.path.exists(log_name):
+            print(f"Skipping {param_name} = {val} (already exists)")
+            continue
         # override one param at a time
         config = default_config.copy()
         config[param_name] = val
@@ -121,11 +128,6 @@ for param_name, values in sweep_config.items():
         def test_acc():
             preds = torch.round(model(dataset['test_input'])[:,0])
             return torch.mean((preds == dataset['test_label'][:,0]).type(dtype))
-
-        log_dir = os.path.join(base_log_dir, param_name)
-        os.makedirs(log_dir, exist_ok=True)
-        log_name = f"sweep/supervised_reg_experiment/{param_name}/{param_name}_{val}.csv"
-        os.makedirs(os.path.dirname(log_name), exist_ok=True)
 
         model.fit(
             dataset,
