@@ -1,7 +1,7 @@
 import torch
 import os
 from kan import *
-from utils import *
+from utilities.utils import *
 
 base_log_dir = '/Users/shamanthk/Documents/KANs-IOMICS/logs/sweep/unsupervised_experiment'
 

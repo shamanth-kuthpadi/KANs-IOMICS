@@ -1,7 +1,7 @@
 import torch
 import os
 from kan import *
-from utils import *
+from utilities.utils import *
 
 base_log_dir = '/Users/shamanthk/Documents/Spring 2025/iomics/focused/logs/sweep/supervised_reg_experiment'
 
