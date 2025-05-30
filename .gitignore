@@ -3,6 +3,6 @@ video
 __pycache__/
 .DS_Store
 video
-logs
-plots
-json_output
+# logs
+# plots
+# json_output

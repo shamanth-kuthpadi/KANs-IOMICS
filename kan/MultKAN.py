@@ -1548,7 +1548,7 @@ class MultKAN(nn.Module):
         for _ in pbar:
             
             if shock_coef and _ == steps // 2:
-                print("⚡️ Shocking ALL coefficients!")
+                print("Shocking ALL coefficients!")
                 for layer in self.act_fun:
                     if hasattr(layer, "coef"):
                         with torch.no_grad():
