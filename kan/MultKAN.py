@@ -1596,18 +1596,20 @@ class MultKAN(nn.Module):
             results['train_loss'].append(torch.sqrt(train_loss).cpu().detach().numpy())
             results['test_loss'].append(torch.sqrt(test_loss).cpu().detach().numpy())
             results['reg'].append(reg_.cpu().detach().numpy())
+            
+            if logger == 'csv':
 
-            subnode_act_mean = sum(t.mean().item() for t in self.subnode_actscale) / len(self.subnode_actscale)
-            # print(len(self.subnode_actscale))
-            edge_act_mean = sum(t.mean().item() for t in self.edge_actscale) / len(self.edge_actscale)
-            # print(len(self.edge_actscale))
-            act_scale_mean = sum(t.mean().item() for t in self.acts_scale) / len(self.acts_scale)
-            # print(len(self.acts_scale))
-            act_scale_spline_mean = sum(t.mean().item() for t in self.acts_scale_spline) / len(self.acts_scale_spline)
-            # print(len(self.acts_scale_spline))
+                subnode_act_mean = sum(t.mean().item() for t in self.subnode_actscale) / len(self.subnode_actscale)
+                # print(len(self.subnode_actscale))
+                edge_act_mean = sum(t.mean().item() for t in self.edge_actscale) / len(self.edge_actscale)
+                # print(len(self.edge_actscale))
+                act_scale_mean = sum(t.mean().item() for t in self.acts_scale) / len(self.acts_scale)
+                # print(len(self.acts_scale))
+                act_scale_spline_mean = sum(t.mean().item() for t in self.acts_scale_spline) / len(self.acts_scale_spline)
+                # print(len(self.acts_scale_spline))
 
-            coef_means = [torch.mean(torch.abs(layer.coef)).item() for layer in self.act_fun if hasattr(layer, "coef")]
-            coef_mean = sum(coef_means) / len(coef_means) if coef_means else 0.0
+                coef_means = [torch.mean(torch.abs(layer.coef)).item() for layer in self.act_fun if hasattr(layer, "coef")]
+                coef_mean = sum(coef_means) / len(coef_means) if coef_means else 0.0
 
             if logger == 'csv':
                 csv_writer.writerow([
