@@ -1,18 +1,49 @@
+"""
+WHAT: Hyperparameter sweep for training a KAN (Kolmogorov-Arnold Network) classifier on synthetic data.
+WHY: To evaluate the effect of various KAN and training hyperparameters on classification performance.
+ASSUMES: 
+    - Existence of KAN implementation (from `kan` package) and utility functions (`create_dataset_clas`) in `utilities.utils`.
+    - Dataset is in a format compatible with KAN training (dict with 'train_input', 'train_label', 'test_input', 'test_label').
+    - PyTorch, pandas, seaborn, and matplotlib are installed.
+    - Output directory exists or is creatable.
+    - If you **do** want the shock coefficient mechanism introduced during training, set `shock_coef=True` in `model.fit()`.
+FUTURE IMPROVEMENTS: 
+    - Parallelize the hyperparameter sweep.
+    - Add logging of model evaluation metrics post-training.
+    - Add checkpointing or early stopping.
+    - Allow command-line config overrides.
+VARIABLES: 
+    - `default_config`: Dictionary of baseline hyperparameters for the KAN model and training.
+    - `sweep_config`: Dictionary of parameters to sweep and their respective value lists.
+    - `dataset`: Dictionary containing train/test splits of inputs and labels.
+    - `log_dir`, `log_name`: Paths for saving logs of each hyperparameter configuration.
+    - `shock_coef`: Used to enable or disable "shock" regularization during training.
+WHO: [S.K.S] 2025/05/31
+
+SAMPLE OUTPUT:
+Skipping k = 1 (already exists)
+=== Running sweep: lamb = 0.001 ===
+...
+Logs saved to /logs/supervised_clas_experiment/lamb/lamb_0.001.csv
+"""
+
+# Import statements
 import torch
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
-from kan import *
-from utilities.utils import *
+from kan import *  # Contains KAN model implementation
+from utilities.utils import *  # Contains `create_dataset_clas`
 
-base_log_dir = '/Users/shamanthk/Documents/KANs-IOMICS/logs/shock/supervised_clas_experiment'
-
+# Set logging directory and device
+base_log_dir = '/Users/shamanthk/Documents/KANs-IOMICS/logs/supervised_clas_experiment'
 torch.set_default_dtype(torch.float64)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+# Default KAN model and training configuration
 default_config = {
-    # --- KAN __init__ parameters ---
+    # KAN model hyperparameters
     'width': [2, 2],
     'scale_sp': 1.0,
     'grid': 3,
@@ -32,7 +63,7 @@ default_config = {
     'save_act': True,
     'sparse_init': False,
 
-    # --- model.fit() parameters ---
+    # Training configuration
     'opt': 'LBFGS',
     'steps': 20,
     'lr': 1.0,
@@ -50,6 +81,7 @@ default_config = {
     'y_th': 1000.0,
 }
 
+# Hyperparameter sweep configuration
 sweep_config = {
     'grid':                  [1, 2, 3, 5, 7],
     'k':                     [1, 2, 3, 5, 7],
@@ -81,9 +113,11 @@ sweep_config = {
 
 logs = []
 
+# Load dataset
 dataset = create_dataset_clas(device)
 dtype = torch.get_default_dtype()
 
+# Sweep over specified parameters
 for param_name, values in sweep_config.items():
     for val in values:
         log_dir = os.path.join(base_log_dir, param_name)
@@ -99,6 +133,7 @@ for param_name, values in sweep_config.items():
 
         print(f"\n=== Running sweep: {param_name} = {val} ===")
 
+        # Instantiate KAN model
         model = KAN(
             width=config['width'],
             scale_sp=config['scale_sp'],
@@ -121,16 +156,25 @@ for param_name, values in sweep_config.items():
             device=device
         )
 
+        # Warm-up forward pass
         model(dataset['train_input'])
 
+        # Define metrics
         def train_acc():
+            """
+            Computes training accuracy.
+            :return: Scalar tensor of training accuracy.
+            """
             return torch.mean((torch.argmax(model(dataset['train_input']), dim=1) == dataset['train_label']).type(dtype))
 
         def test_acc():
+            """
+            Computes test accuracy.
+            :return: Scalar tensor of test accuracy.
+            """
             return torch.mean((torch.argmax(model(dataset['test_input']), dim=1) == dataset['test_label']).type(dtype))
         
-        dtype = torch.get_default_dtype()
-
+        # Train model
         model.fit(
             dataset,
             opt=config['opt'],
@@ -154,6 +198,5 @@ for param_name, values in sweep_config.items():
             save_fig_freq=1,
             logger='csv',
             log_output=log_name,
-            shock_coef=True
+            shock_coef=False
         )
-

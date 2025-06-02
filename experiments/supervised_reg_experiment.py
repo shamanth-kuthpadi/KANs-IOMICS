@@ -1,9 +1,39 @@
+"""
+WHAT: Hyperparameter sweep for training a KAN (Kolmogorov-Arnold Network) on a supervised regression task.
+WHY: To evaluate the effect of various KAN and training hyperparameters on classification performance.
+ASSUMES: 
+    - The `KAN` model is defined in `kan`, and the `create_dataset_super` function exists in `utilities.utils`.
+    - The dataset returned by `create_dataset_super` includes 'train_input', 'train_label', 'test_input', and 'test_label' tensors.
+    - PyTorch (with CUDA optionally), OS module, and all referenced utilities are installed and functional.
+    - The output directory structure is writable.
+    - This script uses regression evaluation based on rounded predictions, assuming a binary-like output format.
+    - If you **do** want the shock coefficient mechanism introduced during training, set `shock_coef=True` in `model.fit()`.
+FUTURE IMPROVEMENTS:
+    - Parallelize the hyperparameter sweep.
+    - Add logging of model evaluation metrics post-training.
+    - Add checkpointing or early stopping.
+    - Allow command-line config overrides.
+VARIABLES:
+    - `default_config`: Dictionary specifying default hyperparameters for model architecture and optimization.
+    - `sweep_config`: Parameter grid to sweep across with different values for each hyperparameter.
+    - `dataset`: Contains the full training and test data split loaded once per run.
+    - `log_dir`, `log_name`: Paths for saving logs of each hyperparameter configuration.    
+    - `shock_coef`: Used to enable or disable "shock" regularization during training.
+WHO: [S.K.S] 2025/05/31
+
+SAMPLE OUTPUT:
+Skipping k = 2 (already exists)
+=== Running sweep: lr = 0.1 ===
+Training complete. Logs saved to: /logs/supervised_reg_experiment/lr/lr_0.1.csv
+"""
+
+
 import torch
 import os
 from kan import *
 from utilities.utils import *
 
-base_log_dir = '/Users/shamanthk/Documents/KANs-IOMICS/logs/shock/supervised_reg_experiment'
+base_log_dir = '/Users/shamanthk/Documents/KANs-IOMICS/logs/supervised_reg_experiment'
 
 torch.set_default_dtype(torch.float64)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -151,5 +181,5 @@ for param_name, values in sweep_config.items():
             save_fig_freq=1,
             logger='csv',
             log_output=log_name,
-            shock_coef=True
+            shock_coef=False
         )

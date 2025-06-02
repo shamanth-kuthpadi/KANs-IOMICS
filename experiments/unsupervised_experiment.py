@@ -1,3 +1,33 @@
+"""
+WHAT: Hyperparameter sweep for training a KAN (Kolmogorov-Arnold Network) on an unsupervised task with symbolic expression fixing.
+WHY: To evaluate the effect of various KAN and training hyperparameters on unsupervised learning performance.
+ASSUMES: 
+    - The `KAN` class is defined in `kan`, and `create_dataset` exists in `utilities.utils`.
+    - `dataset` contains keys: 'train_input', 'train_label', and optionally test sets (though unused here).
+    - Symbolic layer is fixed after initialization via `model.fix_symbolic(...)`.
+    - The script runs unsupervised (no `train_acc` / `test_acc` evaluation used).
+    - If you **do** want the shock coefficient mechanism introduced during training, set `shock_coef=True` in `model.fit()`.
+FUTURE IMPROVEMENTS:
+    - Parallelize the hyperparameter sweep.
+    - Add logging of model evaluation metrics post-training.
+    - Add checkpointing or early stopping.
+    - Allow command-line config overrides.
+VARIABLES:
+    - `default_config`: Default parameters for model structure and optimizer configuration.
+    - `sweep_config`: Parameters to vary across runs (grid, optimizer, regularization, etc.).
+    - `base_log_dir`: Root directory for storing CSV logs by sweep dimension.
+    - `log_name`: Output CSV for saving training logs from `model.fit`.
+    - `shock_coef`: Used to enable or disable "shock" regularization during training.
+WHO: [S.K.S] 2025/05/31
+
+SAMPLE OUTPUT:
+Skipping lamb = 0.01 (already exists)
+=== Sweep k = 3 ===
+Fitting symbolic: layer 1, node 0 -> function: gaussian
+Training complete. Logged to /logs/shock/unsupervised_experiment/k/k_3.csv
+"""
+
+
 import torch
 import os
 from kan import *
