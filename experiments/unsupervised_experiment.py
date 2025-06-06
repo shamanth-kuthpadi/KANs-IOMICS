@@ -33,7 +33,7 @@ import os
 from kan import *
 from utilities.utils import *
 
-base_log_dir = '/Users/shamanthk/Documents/KANs-IOMICS/logs/shock/unsupervised_experiment'
+base_log_dir = '/Users/shamanthk/Documents/KANs-IOMICS/logs/sweep/unsupervised_experiment'
 
 torch.set_default_dtype(torch.float64)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -86,24 +86,26 @@ sweep_config = {
     'scale_base_mu':         [0, 0.5, 1, 2, 3],
     'scale_base_sigma':      [0, 0.5, 1, 2, 3],
     'noise_scale':           [0, 0.5, 1, 2, 3],
-    'seed':                  [4, 9, 110, 124, 147],
+    'seed':                  [0, 1, 10, 32, 4, 9, 110, 124, 147],
     'steps':                 [10, 20, 50],
-    'lr':                    [0.01, 0.1, 1.0],
+    'lr':                    [0.001, 0.01, 0.1, 1.0, 2.0],
     'batch':                 [-1, 32, 50],
     'lamb_l1':               [0.0, 0.1, 1.0],
     'lamb_coefdiff':         [0.0, 0.01, 0.1],
     'update_grid':           [True, False],
-    'grid_update_num':       [5, 10],
+    'grid_update_num':       [2, 5, 10, 20],
     'start_grid_update_step':[ -1, 0],
-    'stop_grid_update_step': [10, 30],
+    'stop_grid_update_step': [10, 20, 30, 40],
     'symbolic_enabled':      [True, False],
     'affine_trainable':      [True, False],
-    'grid_eps':              [0.0, 0.02, 1.0],
+    'grid_eps':              [0.0, 0.001, 0.02, 0.1, 0.5, 1.0],
     'sp_trainable':          [True, False],
     'sb_trainable':          [True, False],
     'sparse_init':           [False, True],
     'singularity_avoiding':  [False, True],
     'y_th':                  [100.0, 1000.0, 10000.0],
+    'base_fun': ['silu', 'relu', 'tanh', 'sin', 'identity'],
+    'opt': ['LBFGS', 'Adam']
 }
 
 dataset = create_dataset(device)
@@ -172,5 +174,5 @@ for param_name, values in sweep_config.items():
             save_fig_freq=1,
             logger='csv',
             log_output=log_name,
-            shock_coef=True
+            shock_coef=False
         )

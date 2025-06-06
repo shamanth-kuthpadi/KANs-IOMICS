@@ -24,7 +24,7 @@ SAMPLE OUTPUT:
 Skipping k = 1 (already exists)
 === Running sweep: lamb = 0.001 ===
 ...
-Logs saved to /logs/supervised_clas_experiment/lamb/lamb_0.001.csv
+Logs saved to /logs/sweep/supervised_clas_experiment/lamb/lamb_0.001.csv
 """
 
 # Import statements
@@ -37,7 +37,7 @@ from kan import *  # Contains KAN model implementation
 from utilities.utils import *  # Contains `create_dataset_clas`
 
 # Set logging directory and device
-base_log_dir = '/Users/shamanthk/Documents/KANs-IOMICS/logs/supervised_clas_experiment'
+base_log_dir = '/Users/shamanthk/Documents/KANs-IOMICS/logs/sweep/supervised_clas_experiment'
 torch.set_default_dtype(torch.float64)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -93,7 +93,7 @@ sweep_config = {
     'noise_scale':           [0, 0.5, 1, 2, 3],
     'seed':                  [4, 9, 110, 124, 147],
     'steps':                 [10, 20, 50],
-    'lr':                    [0.01, 0.1, 1.0],
+    'lr':                    [0.001, 0.01, 0.1, 1.0, 2.0],
     'batch':                 [-1, 32, 50],
     'lamb_l1':               [0.0, 0.1, 1.0],
     'lamb_coefdiff':         [0.0, 0.01, 0.1],
@@ -103,7 +103,7 @@ sweep_config = {
     'stop_grid_update_step': [10, 30],
     'symbolic_enabled':      [True, False],
     'affine_trainable':      [True, False],
-    'grid_eps':              [0.0, 0.02, 1.0],
+    'grid_eps':              [0.0, 0.001, 0.02, 0.1, 0.5, 1.0],
     'sp_trainable':          [True, False],
     'sb_trainable':          [True, False],
     'sparse_init':           [False, True],

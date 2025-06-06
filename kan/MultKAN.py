@@ -194,6 +194,12 @@ class MultKAN(nn.Module):
             base_fun = torch.nn.Identity()
         elif base_fun == 'zero':
             base_fun = lambda x: x*0.
+        elif base_fun == 'relu':
+            base_fun = torch.nn.ReLU()
+        elif base_fun == 'tanh':
+            base_fun = torch.nn.Tanh()
+        elif base_fun == 'sin':
+            base_fun = torch.sin  
             
         self.grid_eps = grid_eps
         self.grid_range = grid_range
