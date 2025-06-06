@@ -1,6 +1,8 @@
 ## Preliminaries
 
+Clone this repository using your preferred method.
 ```bash
+cd KANs-IOMICS
 conda create -n kaniomics python=3.11
 conda activate kaniomics
 
