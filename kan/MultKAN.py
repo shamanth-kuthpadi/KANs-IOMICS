@@ -1491,7 +1491,7 @@ class MultKAN(nn.Module):
                 'train_loss','test_loss','reg',
                 'subnode_act_mean','edge_act_mean',
                 'act_scale_mean','act_scale_spline_mean',
-                'coef_mean'
+                'coef_mean', 'grid_mean', 'mask_mean', 'scale_base_mean', 'scale_sp_mean'
             ])
 
         if lamb > 0. and not self.save_act:
@@ -1616,6 +1616,21 @@ class MultKAN(nn.Module):
 
                 coef_means = [torch.mean(torch.abs(layer.coef)).item() for layer in self.act_fun if hasattr(layer, "coef")]
                 coef_mean = sum(coef_means) / len(coef_means) if coef_means else 0.0
+                
+                grid_means = [torch.mean(torch.abs(layer.grid)).item() for layer in self.act_fun if hasattr(layer, "grid")]
+                grid_mean = sum(grid_means) / len(grid_means) if grid_means else 0.0
+                
+                mask_means = [torch.mean(torch.abs(layer.mask)).item() for layer in self.act_fun if hasattr(layer, "mask")]
+                mask_mean = sum(mask_means) / len(mask_means) if mask_means else 0.0
+                
+                grid_means = [torch.mean(torch.abs(layer.grid)).item() for layer in self.act_fun if hasattr(layer, "grid")]
+                grid_mean = sum(grid_means) / len(grid_means) if grid_means else 0.0
+                
+                scale_base_means = [torch.mean(torch.abs(layer.scale_base)).item() for layer in self.act_fun if hasattr(layer, "scale_base")]
+                scale_base_mean = sum(scale_base_means) / len(scale_base_means) if scale_base_means else 0.0
+                
+                scale_sp_means = [torch.mean(torch.abs(layer.scale_sp)).item() for layer in self.act_fun if hasattr(layer, "scale_sp")]
+                scale_sp_mean = sum(scale_sp_means) / len(scale_sp_means) if scale_sp_means else 0.0
 
             if logger == 'csv':
                 csv_writer.writerow([
@@ -1627,7 +1642,11 @@ class MultKAN(nn.Module):
                     edge_act_mean,
                     act_scale_mean,
                     act_scale_spline_mean,
-                    coef_mean
+                    coef_mean,
+                    grid_mean,
+                    mask_mean,
+                    scale_base_mean,
+                    scale_sp_mean
                 ])
             
             if _ % log == 0:

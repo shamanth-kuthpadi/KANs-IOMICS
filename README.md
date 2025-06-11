@@ -3,10 +3,10 @@
 Clone this repository using your preferred method.
 ```bash
 cd KANs-IOMICS
-conda create -n kaniomics python=3.11
+conda info --envs
 conda activate kaniomics
 
-python -m pip install -r requirements
+python -m pip install -r requirements.txt
 ```
 
 ## Running Experiments
