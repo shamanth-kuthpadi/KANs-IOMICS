@@ -38,3 +38,5 @@ Rememember to disable or enable shocking (a parameter in the fit function) as ne
 
 python -m utilities.visualize_plots --experiment <experiment> --variable <hyperparameter> --shock_type <shock_type>
 ```
+
+Once you visualize the plots, automatically the json formats of the plots should be generated in a `json_output` directory.
