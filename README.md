@@ -13,7 +13,7 @@ python -m pip install -r requirements.txt
 
 ```bash
 # unsupervised learning
-python -m experiments.unsupervised_experiment
+python -m experiments.unsupervised_experiment 
 
 # supervised learning regression
 python -m experiments.supervised_reg_experiment
@@ -22,7 +22,9 @@ python -m experiments.supervised_reg_experiment
 python -m experiments.supervised_clas_experiment  
 ```
 
-Rememember to disable or enable shocking (a parameter in the fit function) as needed within each of each of the corresponding files.
+The sweep parameters were picked arbitrarily and intuitively based on their use cases, we can populate each hyperparameter sweep with as many settings as we want but the current code includes just a few.
+
+Rememember to disable or enable shocking (a parameter in the fit function) as needed by simply removing or adding the flag `--shock`.
 
 ## Visualizing results
 
