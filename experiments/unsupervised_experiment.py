@@ -32,8 +32,16 @@ import torch
 import os
 from kan import *
 from utilities.utils import *
+import argparse
 
-base_log_dir = '/Users/shamanthk/Documents/KANs-IOMICS/logs/sweep/unsupervised_experiment'
+parser = argparse.ArgumentParser(description="KAN Unsupervised Hyperparameter Sweep")
+parser.add_argument('--shock', action='store_true', help="Enable shock regularization during training")
+args = parser.parse_args()
+
+if args.shock:
+    base_log_dir = '/Users/shamanthk/Documents/KANs-IOMICS/logs/shock/unsupervised_experiment'
+else:
+    base_log_dir = '/Users/shamanthk/Documents/KANs-IOMICS/logs/sweep/unsupervised_experiment'
 
 torch.set_default_dtype(torch.float64)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -174,5 +182,5 @@ for param_name, values in sweep_config.items():
             save_fig_freq=1,
             logger='csv',
             log_output=log_name,
-            shock_coef=False
+            shock_coef=args.shock
         )

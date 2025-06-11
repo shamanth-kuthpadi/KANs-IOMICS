@@ -35,13 +35,21 @@ import seaborn as sns
 import os
 from kan import *  # Contains KAN model implementation
 from utilities.utils import *  # Contains `create_dataset_clas`
+import argparse
 
-# Set logging directory and device
-base_log_dir = '/Users/shamanthk/Documents/KANs-IOMICS/logs/sweep/supervised_clas_experiment'
+parser = argparse.ArgumentParser(description="KAN Supervised Hyperparameter Sweep")
+parser.add_argument('--shock', action='store_true', help="Enable shock regularization during training")
+args = parser.parse_args()
+
+if args.shock:
+    base_log_dir = '/Users/shamanthk/Documents/KANs-IOMICS/logs/shock/supervised_clas_experiment'
+else:
+    base_log_dir = '/Users/shamanthk/Documents/KANs-IOMICS/logs/sweep/supervised_clas_experiment'
+
 torch.set_default_dtype(torch.float64)
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# Default KAN model and training configuration
 default_config = {
     # KAN model hyperparameters
     'width': [2, 2],
@@ -81,7 +89,6 @@ default_config = {
     'y_th': 1000.0,
 }
 
-# Hyperparameter sweep configuration
 sweep_config = {
     'grid':                  [1, 2, 3, 5, 7],
     'k':                     [1, 2, 3, 5, 7],
@@ -113,7 +120,6 @@ sweep_config = {
 
 logs = []
 
-# Load dataset
 dataset = create_dataset_clas(device)
 dtype = torch.get_default_dtype()
 
@@ -133,7 +139,6 @@ for param_name, values in sweep_config.items():
 
         print(f"\n=== Running sweep: {param_name} = {val} ===")
 
-        # Instantiate KAN model
         model = KAN(
             width=config['width'],
             scale_sp=config['scale_sp'],
@@ -156,10 +161,8 @@ for param_name, values in sweep_config.items():
             device=device
         )
 
-        # Warm-up forward pass
         model(dataset['train_input'])
 
-        # Define metrics
         def train_acc():
             """
             Computes training accuracy.
@@ -174,7 +177,6 @@ for param_name, values in sweep_config.items():
             """
             return torch.mean((torch.argmax(model(dataset['test_input']), dim=1) == dataset['test_label']).type(dtype))
         
-        # Train model
         model.fit(
             dataset,
             opt=config['opt'],
@@ -198,5 +200,5 @@ for param_name, values in sweep_config.items():
             save_fig_freq=1,
             logger='csv',
             log_output=log_name,
-            shock_coef=False
+            shock_coef=args.shock
         )

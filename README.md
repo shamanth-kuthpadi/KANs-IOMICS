@@ -29,6 +29,7 @@ Rememember to disable or enable shocking (a parameter in the fit function) as ne
 ```bash
 # change --experiment to be [unsupervised_experiment, supervised_reg_experiment, supervised_clas_experiment]
 # change --variable to be the hyperparameter that you wish to get the plots for
+# change --shock_type to be ['sweep', 'shock']
 
-python -m utilities.visualize_plots --experiment <experiment> --variable <hyperparameter>
+python -m utilities.visualize_plots --experiment <experiment> --variable <hyperparameter> --shock_type <shock_type>
 ```
