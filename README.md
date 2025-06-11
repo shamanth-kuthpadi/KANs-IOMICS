@@ -9,6 +9,10 @@ conda activate kaniomics
 python -m pip install -r requirements.txt
 ```
 
+## Code Instrumentation
+
+The code instrumentation can be found [here](https://github.com/shamanth-kuthpadi/KANs-IOMICS/blob/main/kan/MultKAN.py). Scroll to the fit function and you should be able to find the logging code. Refer to this [documentation](https://github.com/shamanth-kuthpadi/KANs-IOMICS/blob/main/KANs__Supervised_Learning.pdf) to understand what variables were logged and how.
+
 ## Running Experiments
 
 ```bash
