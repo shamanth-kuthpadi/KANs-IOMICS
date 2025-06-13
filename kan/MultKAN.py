@@ -2282,24 +2282,41 @@ class MultKAN(nn.Module):
         >>> model.fit(dataset, opt='LBFGS', steps=20, lamb=0.001);
         >>> model.auto_symbolic()
         '''
+        all_edges = {}
+
         for l in range(len(self.width_in) - 1):
             for i in range(self.width_in[l]):
                 for j in range(self.width_out[l + 1]):
                     if self.symbolic_fun[l].mask[j, i] > 0. and self.act_fun[l].mask[i][j] == 0.:
-                        print(f'skipping ({l},{i},{j}) since already symbolic')
+                        if verbose:
+                            print(f'skipping ({l},{i},{j}) since already symbolic')
+                        all_edges[(l, i, j)] = ('already_symbolic', None)
+
                     elif self.symbolic_fun[l].mask[j, i] == 0. and self.act_fun[l].mask[i][j] == 0.:
                         self.fix_symbolic(l, i, j, '0', verbose=verbose > 1, log_history=False)
-                        print(f'fixing ({l},{i},{j}) with 0')
+                        if verbose:
+                            print(f'fixing ({l},{i},{j}) with 0')
+                        all_edges[(l, i, j)] = ('0', 1.0)
+
                     else:
-                        name, fun, r2, c = self.suggest_symbolic(l, i, j, a_range=a_range, b_range=b_range, lib=lib, verbose=False, weight_simple=weight_simple)
+                        name, fun, r2, c = self.suggest_symbolic(l, i, j,
+                                                                a_range=a_range,
+                                                                b_range=b_range,
+                                                                lib=lib,
+                                                                verbose=False,
+                                                                weight_simple=weight_simple)
+                        all_edges[(l, i, j)] = (name, r2)
+
                         if r2 >= r2_threshold:
                             self.fix_symbolic(l, i, j, name, verbose=verbose > 1, log_history=False)
                             if verbose >= 1:
                                 print(f'fixing ({l},{i},{j}) with {name}, r2={r2}, c={c}')
                         else:
-                            print(f'For ({l},{i},{j}) the best fit was {name}, but r^2 = {r2} and this is lower than {r2_threshold}. This edge was omitted, keep training or try a different threshold.')
-                            
+                            if verbose:
+                                print(f'For ({l},{i},{j}) the best fit was {name}, but r^2 = {r2} and this is lower than {r2_threshold}. This edge was omitted.')
+
         self.log_history('auto_symbolic')
+        return all_edges
 
     def symbolic_formula(self, var=None, normalizer=None, output_normalizer = None):
         '''

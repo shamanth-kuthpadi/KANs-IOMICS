@@ -84,12 +84,15 @@ for seed in range(num_seeds):
 
     scores = model.edge_scores[0]
     flat = scores.view(-1)
-    threshold = (flat.mean() + flat.std()) * 0.2
+    threshold = (flat.mean() + flat.std()) * 0.3
 
     significant_indices = (flat > threshold).nonzero(as_tuple=True)[0]
     formatted = [f'x{i.item() + 1}' for i in significant_indices]
 
     print(f"Seed {seed} significant features: {formatted}")
+    model.plot(in_vars=[r'$x_{}$'.format(i) for i in range(1,7)])
+    plt.show()
+    input("Press Enter to continue to the next seed...")
 
     is_match = check_match(formatted, true_sets)
     results.append((formatted, is_match))
