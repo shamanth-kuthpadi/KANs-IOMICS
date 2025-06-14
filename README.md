@@ -40,3 +40,8 @@ python -m utilities.visualize_plots --experiment <experiment> --variable <hyperp
 ```
 
 Once you visualize the plots, automatically the json formats of the plots should be generated in a `json_output` directory.
+
+
+## Hyperparameter Information
+
+|:Hyperparameter:|:Guidelines:|
