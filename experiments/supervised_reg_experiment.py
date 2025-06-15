@@ -86,34 +86,45 @@ default_config = {
 }
 
 sweep_config = {
+    # chosen arbitrarly -- but with the background knowledge of how grids and polynomial function orders operate in B-spline function approximation
     'grid':                  [1, 2, 3, 5, 7],
-    'k':                     [1, 2, 3, 5, 7],
+    'k':                     [1, 2, 3, 5, 7], 
+    # regularization parameters chosen arbitrarly as I do not have any intuition on what value work for what setting
     'lamb':                  [1e-5, 1e-4, 1e-3, 1e-2, 1e-1],
     'lamb_coef':             [1e-1, 5e-1, 1, 1.5, 4.0],
     'lamb_entropy':          [1, 2, 5, 10, 20],
+    # chosen with the knowledge that scale_base_mu should ideally be close to 0 or 1 -- this is typical in most machine learning contexts
     'scale_base_mu':         [0, 0.5, 1, 2, 3],
+    # chosen with the knowledge that scale_base_sigma and noise_scale adds noise and so varying values from low noise to high noise would be good for experimentation
     'scale_base_sigma':      [0, 0.5, 1, 2, 3],
     'noise_scale':           [0, 0.5, 1, 2, 3],
+    # completely random seed settings -- I actually used a random number generator for this
     'seed':                  [4, 9, 110, 124, 147],
+    # arbitrary selections
     'steps':                 [10, 20, 50],
     'lr':                    [0.001, 0.01, 0.1, 1.0, 2.0],
     'batch':                 [-1, 32, 50],
     'lamb_l1':               [0.0, 0.1, 1.0],
     'lamb_coefdiff':         [0.0, 0.01, 0.1],
+    # boolean, so only two values
     'update_grid':           [True, False],
+    # arbitrary selections
     'grid_update_num':       [5, 10],
     'start_grid_update_step':[ -1, 0],
     'stop_grid_update_step': [10, 30],
+    # boolean, so only two values
     'symbolic_enabled':      [True, False],
     'affine_trainable':      [True, False],
+    # arbitrary selections
     'grid_eps':              [0.0, 0.001, 0.02, 0.1, 0.5, 1.0],
+    # boolean, so only two values
     'sp_trainable':          [True, False],
     'sb_trainable':          [True, False],
     'sparse_init':           [False, True],
     'singularity_avoiding':  [False, True],
+    # arbitrary selections
     'y_th':                  [100.0, 1000.0, 10000.0],
 }
-
 
 # Load data once
 dataset = create_dataset_super(device)
