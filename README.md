@@ -44,4 +44,24 @@ Once you visualize the plots, automatically the json formats of the plots should
 
 ## Hyperparameter Information
 
-|:Hyperparameter:|:Guidelines:|
+_Advice from Liu et al._
+
+Effects of hyperparamters on the $$f(x, y) = \exp(\sin(\pi x) + y^2)$$ example.
+
+To get an interpretable graph, we want the number of active activation functions to be as small (ideally
+3) as possible.
+1. We need entropy penalty to reduce the number of active activation functions. Without entropy penalty, there are many duplicate functions.
+
+2. Results can depend on random seeds. With some unlucky seed, the pruned network could be larger than needed.
+
+3. The overall penalty strength λ effectively controls the sparsity.
+
+4. The grid number G also has a subtle effect on interpretability. When G is too small, because each one of activation function is not very expressive, the network tends to use the ensembling strategy, making interpretation harder.
+
+5. The piecewise polynomial order k only has a subtle effect on interpretability. However, it behaves a bit like the random seeds which do not display any visible pattern in this toy example.
+
+![image](https://github.com/user-attachments/assets/085a15a9-deba-4a46-a5a3-3099bd1de3d5)
+
+![image](https://github.com/user-attachments/assets/d46b24bd-64b5-4f8d-b810-bc6f10f9b50e)
+
+
