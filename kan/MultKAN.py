@@ -1312,6 +1312,45 @@ class MultKAN(nn.Module):
         if title != None:
             plt.gcf().get_axes()[0].text(0.5, (y0+z0) * (len(self.width) - 1) + 0.3, title, fontsize=40 * scale, horizontalalignment='center', verticalalignment='center')
 
+    
+    def get_visible_edges(self, beta=3, threshold=0.01, metric='backward', require_mask=True):
+        def score2alpha(score):
+            return np.tanh(beta * score)
+
+        if metric == 'forward_n':
+            scores = self.acts_scale
+        elif metric == 'forward_u':
+            scores = self.edge_actscale
+        elif metric == 'backward':
+            self.attribute()
+            scores = self.edge_scores
+        else:
+            raise Exception(f"Unknown metric '{metric}'")
+
+        alpha_all = [score2alpha(score.cpu().detach().numpy()) for score in scores]
+        visible_edges = []
+
+        for l in range(len(alpha_all)):
+            alpha = alpha_all[l]
+            n_output = len(alpha)
+            n_input = len(alpha[0])
+
+            for j in range(n_output):
+                for i in range(n_input):
+                    a = alpha[j][i]
+                    symbolic_mask = self.symbolic_fun[l].mask[j][i] if hasattr(self.symbolic_fun[l], 'mask') else 1
+                    numeric_mask = self.act_fun[l].mask[i][j] if hasattr(self.act_fun[l], 'mask') else 1
+
+                    if require_mask:
+                        if symbolic_mask > 0 and numeric_mask > 0 and a > threshold:
+                            visible_edges.append((l, i, j))
+                    else:
+                        if a > threshold:
+                            visible_edges.append((l, i, j))
+
+        return visible_edges
+
+        
             
     def reg(self, reg_metric, lamb_l1, lamb_entropy, lamb_coef, lamb_coefdiff):
         '''
