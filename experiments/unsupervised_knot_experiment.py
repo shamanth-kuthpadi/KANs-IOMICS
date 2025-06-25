@@ -1,9 +1,11 @@
 import pandas as pd
 import numpy as np
 import torch
+import matplotlib.pyplot as plt
 from kan import *
 import copy
 import tempfile
+import os
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
@@ -16,7 +18,7 @@ torch.set_default_dtype(torch.float64)
 dtype = torch.get_default_dtype()
 
 # Download data: https://colab.research.google.com/github/deepmind/mathematics_conjectures/blob/main/knot_theory.ipynb#scrollTo=l10N2ZbHu6Ob
-df = pd.read_csv("../knot_data.csv")
+df = pd.read_csv("/Users/shamanthk/Documents/KANs-IOMICS/knot_data.csv")
 df.keys()
 
 X = df[df.keys()[1:]].to_numpy()
@@ -64,7 +66,7 @@ num_seeds = 100
 lambs = [10e-2, 10e-3]
 
 for seed in range(num_seeds):
-    for lamb in range(lambs):
+    for lamb in lambs:
         model = KAN(width=[n_feature,1,1], grid=5, k=3, seed=seed, device=device)
         model.fix_symbolic(1,0,0,'gaussian',fit_params_bool=False)
         model.fit(dataset, lamb=0.001, batch=1024, metrics=[train_acc, test_acc], display_metrics=['train_loss', 'reg', 'train_acc', 'test_acc']);
@@ -75,5 +77,11 @@ for seed in range(num_seeds):
         n = 18
         for i in range(n):
             plt.gcf().get_axes()[0].text(1/(2*n)+i/n-0.005,-0.02,df.keys()[1:][i], rotation=270, rotation_mode="anchor")
+        
+        # Create directory if it doesn't exist
+        save_dir = "unsupervised_knot_experiment"
+        os.makedirs(save_dir, exist_ok=True)
+        plt.savefig(f"{save_dir}/seed_{seed}_lamb_{lamb}.png", bbox_inches='tight', dpi=300)
+        plt.close()
             
         print(dataset['train_input'].shape)

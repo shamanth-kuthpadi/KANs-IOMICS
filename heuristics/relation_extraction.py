@@ -40,7 +40,7 @@ def create_dataset(train_num=500, test_num=500):
     }
 
 # ===== Experiment =====
-num_seeds = 4
+num_seeds = 100
 results = []
 found_relations = []
 
@@ -65,5 +65,7 @@ for seed in range(num_seeds):
     model.auto_symbolic(lib=lib)
 
     significant_features = model.get_visible_edges(require_mask=False)
-    
+
     print(f"Seed {seed} significant features: {significant_features}")
+    
+    input("CLICK ENTER FOR NEXT SEED")
