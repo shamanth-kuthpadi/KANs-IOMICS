@@ -16,14 +16,17 @@ Most of the source code instrumentation can be found [here](https://github.com/s
 ## Running Experiments
 
 ```bash
-# unsupervised learning
-python -m experiments.unsupervised.unsupervised_experiment
+# unsupervised learning w/ original six-input toy dataset
+python -m experiments.unsupervised.toy.experiment
+
+# unsupervised learning w/ knot dataset
+python -m experiments.unsupervised.knot.experiment
 
 # supervised learning regression
-python -m experiments.unsupervised.supervised_reg_experiment
+python -m experiments.supervised.regression.experiment
 
 # supervised learning classification
-python -m experiments.supervised.supervised_clas_experiment
+python -m experiments.supervised.classification.experiment
 ```
 
 The sweep parameters were picked arbitrarily and intuitively based on their use cases, we can populate each hyperparameter sweep with as many settings as we want but the current code includes just a few.

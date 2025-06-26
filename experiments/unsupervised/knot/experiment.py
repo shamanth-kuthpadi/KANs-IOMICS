@@ -18,7 +18,7 @@ torch.set_default_dtype(torch.float64)
 dtype = torch.get_default_dtype()
 
 # Download data: https://colab.research.google.com/github/deepmind/mathematics_conjectures/blob/main/knot_theory.ipynb#scrollTo=l10N2ZbHu6Ob
-df = pd.read_csv("/Users/shamanthk/Documents/KANs-IOMICS/knot_data.csv")
+df = pd.read_csv("data/unsupervised/knot/knot_data.csv")
 df.keys()
 
 X = df[df.keys()[1:]].to_numpy()
