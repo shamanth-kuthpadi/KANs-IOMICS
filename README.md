@@ -66,3 +66,8 @@ To get an interpretable graph, we want the number of active activation functions
 ![image](https://github.com/user-attachments/assets/085a15a9-deba-4a46-a5a3-3099bd1de3d5)
 
 ![image](https://github.com/user-attachments/assets/d46b24bd-64b5-4f8d-b810-bc6f10f9b50e)
+
+
+## General Notes
+
+- For certain hyperparameter settings the model might break (this could be for various reasons) in that case just rerun the command and it should automatically skip over already run settings. 
