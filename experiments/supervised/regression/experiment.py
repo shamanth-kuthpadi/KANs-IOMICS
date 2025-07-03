@@ -47,8 +47,8 @@ torch.set_default_dtype(torch.float64)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 default_config = {
-    # --- KAN __init__ parameters ---
-    'width': [2, 1],
+    # KAN model hyperparameters
+    'width': [2, 2],
     'scale_sp': 1.0,
     'grid': 3,
     'k': 3,
@@ -66,8 +66,10 @@ default_config = {
     'seed': 147,
     'save_act': True,
     'sparse_init': False,
+    'scale_sp': 1.0,
+    'mult_arity': 2,
 
-    # --- model.fit() parameters ---
+    # Training configuration
     'opt': 'LBFGS',
     'steps': 20,
     'lr': 1.0,
@@ -83,6 +85,8 @@ default_config = {
     'stop_grid_update_step': 50,
     'singularity_avoiding': False,
     'y_th': 1000.0,
+    'reg_metric': 'edge_forward_spline_n',
+    'beta': 3.0,
 }
 
 sweep_config = {
@@ -124,7 +128,13 @@ sweep_config = {
     'singularity_avoiding':  [False, True],
     # arbitrary selections
     'y_th':                  [100.0, 1000.0, 10000.0],
+    'base_fun':              ['silu', 'identity', 'zero', 'relu', 'tanh', 'sin'],
+    'scale_sp':              [0.0, 0.5, 1.0, 2.0, 3.0],
+    'mult_arity':            [1, 2, 3, 4, 5],
+    'reg_metric':            ['edge_forward_spline_n', 'edge_forward_spline_u', 'edge_forward_sum', 'edge_backward', 'node_backward'],
+    'beta':                  [1.0, 2.0, 3.0, 4.0, 5.0],
 }
+
 
 # Load data once
 dataset = create_dataset_super(device)
